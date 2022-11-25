@@ -1,0 +1,45 @@
+import example.*
+
+
+describe "tests varios" {
+	
+	
+	const diamante = new Recurso(cotizacion = 10)
+	const madera = new Recurso(cotizacion = 1)
+	
+	const juan = new Jugador(items = [new ItemGema(recurso = diamante,cant = 1, importancia = 2), new Item(recurso = madera, cant = 2)])
+	const pedro = new Jugador(items = [new ItemGema(recurso = diamante,cant = 10, importancia = 2)])
+
+	const jojo = new Personaje()
+	const pepe = new Personaje()
+
+
+
+test "prueba del punto 1" {
+	
+	juan.elegirPersonaje(jojo)
+	pedro.elegirPersonaje(pepe)
+	jojo.atrapar(pepe,100,1)
+	assert.equals(juan.cantAtrapadas(), 1)
+
+}
+
+test "las gemas de pedro pierden su valor porque juan lo atrapo" {
+	juan.elegirPersonaje(jojo)
+	pedro.elegirPersonaje(pepe)
+	const valorAnterior = pedro.cantidadRecursosValiosos()
+	jojo.atrapar(pepe,100,1)
+	const valorPosterior = pedro.cantidadRecursosValiosos() 
+	assert.that(valorAnterior > valorPosterior)
+}
+
+test "recursos de juan mejoran porque atrapo a otro jugador" {
+	juan.elegirPersonaje(jojo)
+	pedro.elegirPersonaje(pepe)
+	const valorAnterior = juan.cantidadRecursosValiosos()
+	jojo.atrapar(pepe,100,1)
+	const valorPosterior = juan.cantidadRecursosValiosos() 
+	assert.that(valorAnterior < valorPosterior)
+}
+}
+
