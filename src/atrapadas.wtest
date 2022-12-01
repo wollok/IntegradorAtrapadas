@@ -1,4 +1,4 @@
-import example.*
+import atrapadas.*
 
 
 describe "tests varios" {

@@ -17,11 +17,11 @@ class Jugador {
 	
 	method cantidadRecursosValiosos() = items.count{r => r.valor() > 100 }
 	
-	method atrapasteUnPersonaje(atrapada,personaje){
-		items.forEach{r => r.ganarRecursos(atrapada, personaje) }
+	method atrapasteUnPersonaje(atrapada){
+		items.forEach{r => r.ganarRecursos(atrapada) }
 	}
-	method teAtraparonUnPersonaje(atrapada,personaje){
-		items.forEach{r => r.perderRecursos(atrapada, personaje) }
+	method teAtraparonUnPersonaje(atrapada){
+		items.forEach{r => r.perderRecursos(atrapada) }
 	}
 	
 	method elegirPersonaje(p) { 
@@ -35,10 +35,10 @@ class Personaje {
 	const atrapadas = []
 	
 	method atrapar(personaje, puntos, tiempo) {
-		const atrapada = new Atrapada(tiempo = tiempo, puntos = puntos, atrapado = personaje)
+		const atrapada = new Atrapada(tiempo = tiempo, puntos = puntos, atrapador = self,jugador = personaje.jugador())
 		atrapadas.add(atrapada)
-		personaje.jugador().teAtraparonUnPersonaje(atrapada, self)
-		jugador.atrapasteUnPersonaje(atrapada, self) 
+		personaje.jugador().teAtraparonUnPersonaje(atrapada)
+		jugador.atrapasteUnPersonaje(atrapada) 
 	}
 	
 	method cantAtrapadas() = atrapadas.size()
@@ -51,7 +51,8 @@ class Personaje {
 class Atrapada {
 	var property tiempo
 	var property puntos
-	var property atrapado
+	var property atrapador
+	var property jugador
 	
 	method esGrande() = puntos > 10
 }
@@ -67,14 +68,14 @@ class Item {
 	var property cant
 	//var property importancia = 1 // para las gemas
 	
-	method ganarRecursos(atrapada, atrapador) {
+	method ganarRecursos(atrapada) {
 		cant = cant + atrapada.puntos() * self.incrementoTiempoExtra(atrapada)
 	}
 	
 	method incrementoTiempoExtra(atrapada) =
 		if(atrapada.tiempo()> 100) videoJuego.formulaExtrania(atrapada.tiempo()) else 1
 
-	method perderRecursos(atrapada, personaje)  { }
+	method perderRecursos(atrapada)  { }
 	
 	method valor() = cant * recurso.cotizacion()
 }
@@ -87,11 +88,11 @@ class ItemPersonalizado inherits Item{
 		personajesCompatibles.add(p)
 	}
 	
-	override method ganarRecursos(atrapada, atrapador) {
-		if(personajesCompatibles.contains(atrapador)) 
+	override method ganarRecursos(atrapada) {
+		if(personajesCompatibles.contains(atrapada.atrapador())) 
 			self.duplicar()
 		else 
-			super(atrapada, atrapador)
+			super(atrapada)
 	}
 	method duplicar() { 
 		cant *= 2
@@ -101,7 +102,7 @@ class ItemPersonalizado inherits Item{
 class ItemGema inherits Item {
 	var property importancia 
 	
-	override method perderRecursos(atrapada, personaje) { 
+	override method perderRecursos(atrapada) { 
 		cant = cant - atrapada.puntos() * importancia * self.incrementoTiempoExtra(atrapada)
 	}
 	override method valor() = super() * importancia
